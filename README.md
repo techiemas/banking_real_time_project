@@ -143,3 +143,23 @@ For continuous data like this Banking Pipeline, the best "CDC" approach is **Spa
 *   **Cons**: Higher cost (cluster runs 24/7).
 
 *Current Setup (Micro-Batch)*: We use Cloud Workflows to run efficiently on demand. To automate this, you would typically add a **Cloud Scheduler** trigger to verify data availability every X minutes.
+
+## Recommendations for Enterprise Production
+
+To take this project from a "Concept Demo" to a "Real-World Enterprise Pipeline", consider adding:
+
+### 1. Switch Gold Layer to dbt (ELT vs ETL)
+In modern data engineering, we prefer **ELT** (Extract, Load, Transform).
+*   **Current Service**: PySpark writes Gold tables.
+*   **Real-World**: PySpark handles heavy cleaning (Silver), but **dbt** (Data Build Tool) handles the Gold aggregations using SQL. It creates documentation, lineage, and testing out-of-the-box.
+
+### 2. Data Quality & Observability
+*   **Great Expectations**: Add a step before the Silver write to validate schema (e.g., "amount must be > 0", "id must not be null").
+*   **Data Observability**: Tools like Monte Carlo or basic **Cloud Monitoring** alerts to ping you if data volume drops or "null" counts spike.
+
+### 3. Data Governance (PII)
+*   **Policy Tags**: Tag `account_id` as "Sensitive" in BigQuery.
+*   **Column-Level Security**: Ensure only authorized groups can unmask PII.
+
+### 4. Backfilling Strategy
+*   Real pipelines often need to re-process historical data. Your workflow should accept a `date_range` parameter to process specific past days without duplicating data.
