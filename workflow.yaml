@@ -1,0 +1,45 @@
+main:
+  steps:
+    - init:
+        assign:
+          - project_id: "jaffle-shop-481012"
+          - region: "us-central1"
+          - bucket: "dataproc-temp234-jaffle-shop-481012"
+          - batch_id: ${"bank-workflow-" + string(int(sys.now()))}
+
+    # Step 1: Run Transaction Generator
+    - run_generator:
+        call: googleapis.run.v1.namespaces.jobs.run
+        args:
+          name: ${"namespaces/" + project_id + "/jobs/bank-generator-job"}
+          location: ${region}
+        result: generator_execution
+
+    # Step 2: Submit Dataproc Batch using generic HTTP (more robust)
+    - run_dataproc_batch:
+        call: http.post
+        args:
+          url: ${"https://dataproc.googleapis.com/v1/projects/" + project_id + "/locations/" + region + "/batches"}
+          query:
+            batchId: ${batch_id}
+          auth:
+            type: OAuth2
+          body:
+            pysparkBatch:
+              mainPythonFileUri: ${"gs://" + bucket + "/main.py"}
+              # Pass JAR via properties to match verify.ps1 EXACTLY
+            runtimeConfig:
+              version: "1.1"
+              properties:
+                "spark.jars.packages": "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.34.0"
+        result: dataproc_operation
+
+    # Step 3: Wait for Batch to Complete (Polling)
+    # The http.post returns the Long Running Operation (LRO). 
+    # We can perform a simple check or just return the LRO name for the user to check.
+    # To keep the workflow simple and cheap, we will just return the LRO to show successful submission.
+    
+    - return_result:
+        return:
+          generator_status: ${generator_execution}
+          dataproc_lro: ${dataproc_operation.body.name}

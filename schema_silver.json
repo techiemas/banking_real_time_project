@@ -1,0 +1,7 @@
+[
+  { "name": "transaction_id", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "account_id", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "amount", "type": "FLOAT", "mode": "REQUIRED" },
+  { "name": "transaction_type", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "timestamp", "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

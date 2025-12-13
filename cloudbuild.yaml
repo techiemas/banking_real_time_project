@@ -1,0 +1,44 @@
+steps:
+  # 1. Build Data Generator Image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/bank-generator', './generator']
+    
+  # 2. Push Image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/bank-generator']
+
+  # 3. Deploy Generator as Cloud Run Job
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'jobs'
+      - 'deploy'
+      - 'bank-generator-job'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/bank-generator'
+      - '--region'
+      - 'us-central1'
+      # Re-use existing settings or force new ones (env vars need to be secure in real ops)
+
+  # 4. Upload PySpark Code to GCS (Transformation Layer)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gsutil
+    args: ['cp', 'pyspark/main.py', 'gs://dataproc-temp234-$PROJECT_ID/main.py']
+
+  # 5. Deploy Cloud Workflow (Orchestration Layer)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'workflows'
+      - 'deploy'
+      - 'bank-pipeline'
+      - '--source=workflow.yaml'
+      - '--location=us-central1'
+      - '--service-account=${_PROJECT_NUMBER}-compute@developer.gserviceaccount.com'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _PROJECT_NUMBER: "963517928922" # Replace with variable if needed
