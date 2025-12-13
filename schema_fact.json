@@ -1,17 +1,5 @@
 [
-  {
-    "name": "transaction_type",
-    "type": "STRING",
-    "mode": "REQUIRED"
-  },
-  {
-    "name": "total_transactions",
-    "type": "INTEGER",
-    "mode": "REQUIRED"
-  },
-  {
-    "name": "total_amount",
-    "type": "FLOAT",
-    "mode": "REQUIRED"
-  }
+  { "name": "transaction_type", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "total_transactions", "type": "INTEGER", "mode": "REQUIRED" },
+  { "name": "total_amount", "type": "FLOAT", "mode": "REQUIRED" }
 ]

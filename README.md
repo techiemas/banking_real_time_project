@@ -56,6 +56,13 @@ This project deploys a real-time banking data pipeline on Google Cloud Platform 
     .\verify.ps1
     ```
 
+    **Option B: Local Python Script (No Cloud Run required)**
+    If you prefer to run the generator from your laptop:
+    ```powershell
+    $env:PROJECT_ID="jaffle-shop-481012"
+    python generator/main.py
+    ```
+
 ## CI/CD (Continuous Deployment)
 
 Yes, you can use **Google Cloud Build** to automate the deployment of this pipeline whenever you push code to GitHub.
