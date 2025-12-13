@@ -17,6 +17,7 @@ This project deploys a real-time banking data pipeline on Google Cloud Platform 
 
 | Service | Component | Why it was chosen | Where it is used |
 | :--- | :--- | :--- | :--- |
+| **Cloud SQL** | Operational Database (Source) | Represents the transactional ledger (OLTP) where banking operations effectively occur. | *Defined in Terraform*. Acts as the upstream source system (Note: The current demo generator mocks this by writing directly to Pub/Sub to save costs). |
 | **Cloud Run (Jobs)** | Data Generator | Serverless, cost-effective for finite batch jobs (pay-per-use). | `bank-generator-job`: Runs the Python script to generate synthetic transactions. |
 | **Pub/Sub** | Ingestion Layer | Decouples generation from storage; handles spikes in real-time data. | Topic: `bank-transactions`. Subscription pushes data directly to BigQuery. |
 | **BigQuery** | Data Warehouse | Serverless, highly scalable, SQL-based analysis. | Dataset: `banking_prod`. Stores Raw, Silver, and Gold tables. |
