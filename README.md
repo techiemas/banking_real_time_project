@@ -61,11 +61,12 @@ Yes, you can use **Google Cloud Build** to automate the deployment of this pipel
 
 A `cloudbuild.yaml` file is included in the project. It performs the following steps automatically:
 
-1.  **Build**: Builds the Python Generator Docker image.
-2.  **Push**: Pushes the image to Google Container Registry (GCR).
-3.  **Deploy Generator**: Updates the Cloud Run Job.
-4.  **Deploy Transformation**: Copies the latest `pyspark/main.py` code to the Cloud Storage bucket.
-5.  **Deploy Workflow**: Deploys the updated `workflow.yaml` to Cloud Workflows.
+1.  **Infrastructure**: runs `terraform apply` to ensure BigQuery tables and Pub/Sub topics are configured correctly.
+2.  **Build**: Builds the Python Generator Docker image.
+3.  **Push**: Pushes the image to Google Container Registry (GCR).
+4.  **Deploy Generator**: Updates the Cloud Run Job.
+5.  **Deploy Transformation**: Copies the latest `pyspark/main.py` code to the Cloud Storage bucket.
+6.  **Deploy Workflow**: Deploys the updated `workflow.yaml` to Cloud Workflows.
 
 ### How to set it up:
 1.  Connect your GitHub repository to **Google Cloud Build**.

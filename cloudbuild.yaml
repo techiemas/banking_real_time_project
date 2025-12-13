@@ -1,4 +1,15 @@
 steps:
+  # 0. Infrastructure - Terraform Apply (Optional - Requires Remote State)
+  # This ensures your BigQuery datasets, Topics, and Permissions are up to date.
+  - name: 'hashicorp/terraform:light'
+    dir: 'terraform'
+    args: ['init']
+  - name: 'hashicorp/terraform:light'
+    dir: 'terraform'
+    args: ['apply', '-auto-approve']
+    env:
+      - 'TF_VAR_project_id=$PROJECT_ID'
+
   # 1. Build Data Generator Image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/bank-generator', './generator']
