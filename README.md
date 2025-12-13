@@ -163,3 +163,34 @@ In modern data engineering, we prefer **ELT** (Extract, Load, Transform).
 
 ### 4. Backfilling Strategy
 *   Real pipelines often need to re-process historical data. Your workflow should accept a `date_range` parameter to process specific past days without duplicating data.
+
+## 🚀 How to Clone & Run (For New Users)
+
+If you are cloning this repository to your own GCP environment, follow these steps:
+
+### 1. GCP Setup
+1.  **Create a GCP Project** (e.g., `my-bank-project`).
+2.  **Enable Billing** for that project.
+3.  **Install Google Cloud SDK** locally and run:
+    ```bash
+    gcloud auth login
+    gcloud config set project my-bank-project
+    ```
+
+### 2. Code Changes (Update Project ID)
+The project ID `jaffle-shop-481012` and bucket names are currently hardcoded. You must **Find & Replace** them with your own:
+
+| File | Change Required |
+| :--- | :--- |
+| `setup_infra.ps1` | Update `$PROJECT_ID` variable at the top. |
+| `pyspark/main.py` | Update default `project_id` and bucket names (or pass as args). |
+| `workflow.yaml` | Update `project_id` and `bucket` variables in the `init` step. |
+| `verify.ps1` | Update `$PROJECT_ID` and `$BUCKET` variables. |
+| `cloudbuild.yaml` | (Optional) Update `_PROJECT_NUMBER` substitution if using CI/CD. |
+
+### 3. Run Setup
+Once updated, simply run:
+```powershell
+.\setup_infra.ps1
+```
+This will automatically enable all APIs, create your BigQuery tables, Pub/Sub topics, and deploy the generator.
