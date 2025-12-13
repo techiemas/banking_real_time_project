@@ -119,3 +119,27 @@ A `cloudbuild.yaml` file is included in the project. It performs the following s
     ```powershell
     bq query --use_legacy_sql=false "SELECT count(*) as count FROM banking_prod.banking_silver"
     ```
+
+## Advanced Patterns (CDC & Event-Driven)
+
+**User Question**: *Can we trigger the Dataproc job automatically as soon as data arrives in the Raw table?*
+
+**Answer**: Yes, there are two main ways to achieve this:
+
+### 1. Event-Driven Batch (Near Real-Time)
+You can use **Eventarc** to listen for specific events in BigQuery and trigger the workflow immediately.
+*   **Mechanism**: Configure Eventarc to listen for `google.cloud.bigquery.v2.JobService.InsertJob` (data load event) on `banking_raw`.
+*   **Target**: Eventarc triggers the **Cloud Workflow**.
+*   **Pros**: Automated, runs only when data arrives.
+*   **Cons**: Dataproc has a ~90s startup time. If data arrives continuously (streaming), you will trigger too many small jobs, which is inefficient and expensive. This is best for *file uploads* or *periodic dumps*.
+
+### 2. Stream Processing (True Real-Time)
+For continuous data like this Banking Pipeline, the best "CDC" approach is **Spark Structured Streaming**.
+*   **Mechanism**: Dataproc runs a **continuous, 24/7 job**.
+*   **Source**: It reads directly from **Pub/Sub** (not BigQuery Raw).
+*   **Action**: It processes (cleans/aggregates) in real-time.
+*   **Sink**: Writes directly to `banking_silver` and `banking_gold`.
+*   **Pros**: extremely low latency (<1s).
+*   **Cons**: Higher cost (cluster runs 24/7).
+
+*Current Setup (Micro-Batch)*: We use Cloud Workflows to run efficiently on demand. To automate this, you would typically add a **Cloud Scheduler** trigger to verify data availability every X minutes.
