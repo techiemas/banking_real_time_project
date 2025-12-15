@@ -194,3 +194,25 @@ Once updated, simply run:
 .\setup_infra.ps1
 ```
 This will automatically enable all APIs, create your BigQuery tables, Pub/Sub topics, and deploy the generator.
+
+## 📂 Project Structure
+
+```text
+bank-pipeline/
+├── generator/                 # Cloud Run Job (Python) for synthetic data
+│   ├── main.py                # Transaction generation logic
+│   ├── Dockerfile             # Container definition
+│   └── requirements.txt       # Python dependencies
+├── pyspark/                   # Dataproc Serverless (PySpark) transformations
+│   └── main.py                # Medallion Architecture logic (Bronze->Silver->Gold)
+├── terraform/                 # Infrastructure as Code (Production)
+│   ├── main.tf                # Resource definitions (BigQuery, Pub/Sub, etc.)
+│   ├── variables.tf           # Terraform variables
+│   └── provider.tf            # GCP Provider config
+├── cloudbuild.yaml            # CI/CD Pipeline configuration
+├── workflow.yaml              # Cloud Workflows orchestration definition
+├── setup_infra.ps1            # Quick setup script for Windows
+├── verify.ps1                 # Verification and testing script
+├── CHANGELOG.md               # Project history and versioning
+└── README.md                  # Project documentation
+```
